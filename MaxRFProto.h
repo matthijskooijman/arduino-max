@@ -1,0 +1,126 @@
+#ifndef __MAX_RF_PROTO_H
+#define __MAX_RF_PROTO_H
+
+#include <stdint.h>
+#include <Print.h>
+#include <TStreaming.h>
+
+#include "Util.h"
+
+const size_t RF_ADDR_SIZE = 24;
+
+typedef HexBits<RF_ADDR_SIZE> Address;
+typedef Fixed<10, 1> ActualTemp;
+typedef Fixed<2, 1> SetTemp;
+
+enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST};
+enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
+
+class UntilTime : public Printable {
+public:
+  /* Parse an until time from three bytes from an RF packet */
+  UntilTime(const uint8_t *buf);
+
+  virtual size_t printTo(Print &p) const;
+
+  uint8_t year, month, day;
+
+  /* In 30-minute increments */
+  uint8_t time;
+};
+
+
+class MaxRFMessage : public Printable {
+public:
+  /**
+   * Parse a RF message. Buffer should contain only headers and
+   * payload (so no length byte and no CRC).
+   *
+   * Note that the message might keep a reference to the buffer around
+   * to prevent unnecessary copies!
+   */
+  static MaxRFMessage *parse(const uint8_t *buf, size_t len);
+
+  /**
+   * Returns a string describing a given message type.
+   */
+  static const char *type_to_str(uint8_t type);
+
+  virtual size_t printTo(Print &p) const;
+
+  uint8_t seqnum;
+  uint8_t flags;
+  uint8_t type;
+  uint32_t addr_from;
+  uint32_t addr_to;
+  uint8_t group_id;
+
+  virtual ~MaxRFMessage() {}
+private:
+  static MaxRFMessage *create_message_from_type(uint8_t type);
+  virtual bool parse_payload(const uint8_t *buf, size_t len) = 0;
+};
+
+class UnknownMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+
+  /**
+   * The raw data of the message (excluding headers).
+   * Shouldn't be freed, since this is a reference into the buffer
+   * passed to parse.
+   */
+  const uint8_t* payload;
+  size_t payload_len;
+};
+
+class SetTemperatureMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+
+  uint8_t set_temp; /* In 0.5° units */
+  enum mode mode;
+
+  UntilTime *until; /* Only when mode is MODE_TEMPORARY */
+
+  virtual ~SetTemperatureMessage() {delete this->until; }
+};
+
+class WallThermostatStateMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+
+  uint8_t actual_temp; /* In 0.1° units */
+  uint8_t set_temp; /* In 0.5° units */
+};
+
+class ThermostatStateMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+
+  bool dst;
+  bool locked;
+  bool battery_low;
+  enum mode mode;
+  uint8_t valve_pos; /* In percent */
+  uint8_t set_temp; /* In 0.5° units */
+  uint8_t actual_temp; /* In 0.1° units, 0 when not present */
+  UntilTime *until; /* Only when mode is MODE_TEMPORARY */
+  virtual ~ThermostatStateMessage() {delete this->until; }
+};
+
+class SetDisplayActualTemperatureMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+
+  enum display_mode display_mode;
+};
+
+#endif // __MAX_RF_PROTO_H
+
+/* vim: set sw=2 sts=2 expandtab: */
