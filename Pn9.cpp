@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <avr/pgmspace.h>
 
 #include "Pn9.h"
 #include "Util.h"
@@ -20,7 +21,7 @@ def pn9(state):
             state = (state >> 1) + (((state & 1) ^ (state >> 5) & 1) << 8)
 print(list(itertools.islice(pn9(0x1ff), 255)))
  */
-static const uint8_t pn9_table[] = {
+static const uint8_t PROGMEM pn9_table[] = {
   0xff, 0xe1, 0x1d, 0x9a, 0xed, 0x85, 0x33, 0x24,
   0xea, 0x7a, 0xd2, 0x39, 0x70, 0x97, 0x57, 0x0a,
   0x54, 0x7d, 0x2d, 0xd8, 0x6d, 0x0d, 0xba, 0x8f,
@@ -63,7 +64,7 @@ int xor_pn9(uint8_t *buf, size_t len) {
     return -1;
 
   for (int i = 0; i < len; ++i)
-    buf[i] ^= pn9_table[i];
+    buf[i] ^= pgm_read_byte(pn9_table[i]);
 
   return 0;
 }
