@@ -1,6 +1,9 @@
 #include "Max.h"
 
 #include <TStreaming.h>
+#ifdef ETHERNET
+#include <Ethernet.h>
+#endif
 
 #ifdef LCD_I2C
 #include <LiquidCrystal_I2C.h>
@@ -62,7 +65,14 @@ Null lcd;
 bool kettle_status;
 #endif // KETTLE_RELAY_PIN
 
+
+#ifdef ETHERNET
+EthernetServer server = EthernetServer(1234); //port 80
+
+DoublePrint p = (Serial & server);
+#else
 Print &p = Serial;
+#endif
 
 void printStatus() {
   #ifdef LCD_I2C
@@ -156,6 +166,16 @@ void setup()
   pinMode(KETTLE_RELAY_PIN, OUTPUT);
   #endif // KETTLE_RELAY_PIN
 
+  #ifdef ETHERNET
+  byte mac[] = ETHERNET_MAC;
+  if (Ethernet.begin(mac))
+    p << F("IP: ") << Ethernet.localIP() << "\r\n";
+  else
+    p << F("DHCP Failure") << "\r\n";
+
+  server.begin();
+  #endif
+
   p << F("Initialized") << "\r\n";
   printStatus();
 }
@@ -167,6 +187,12 @@ void loop()
 
   if (Serial.read() != -1)
     Serial.println("OK");
+
+  #ifdef ETHERNET
+  EthernetClient c = server.available();
+  if (c && c.read() != -1)
+    c.println("OK");
+  #endif
 
   if (rf.recv(buf, &len))
   {

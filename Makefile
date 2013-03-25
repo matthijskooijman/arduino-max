@@ -1,4 +1,4 @@
-ARDUINO_LIBS = SPI RF22 LiquidCrystal_I2C Wire Wire/utility TStreaming
+ARDUINO_LIBS = SPI RF22 LiquidCrystal_I2C Wire Wire/utility TStreaming Ethernet Ethernet/utility
 #BOARD_TAG    = uno
 #ARDUINO_PORT = /dev/ttyACM*
 BOARD_TAG    = ethernet

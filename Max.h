@@ -7,6 +7,11 @@
 // Enable the LCD display (undef to disable)
 #define LCD_I2C
 
+// Enable the ethernet server (undef to disable)
+#define ETHERNET
+
+#define ETHERNET_MAC  { 0x90, 0xA2, 0xDA, 0x0D, 0xb5, 0x82 }
+
 /* String stored in Flash. Type helps the Print class to autoload the
  * string during printing. */
 typedef __FlashStringHelper FlashString;
