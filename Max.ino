@@ -143,7 +143,7 @@ void setup()
   Serial.begin(115200);
 
   if (!rf.init())
-    Serial.println("RF init failed");
+    Serial.println(F("RF init failed"));
 
   #ifdef LCD_I2C
   lcd.init();
