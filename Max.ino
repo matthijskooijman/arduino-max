@@ -12,6 +12,8 @@
 #include "MaxRFProto.h"
 #include "Pn9.h"
 
+static_assert(PN9_LEN >= RF22_MAX_MESSAGE_LEN, "Not enough pn9 bytes defined");
+
 enum device_type {
   DEVICE_CUBE,
   DEVICE_WALL,
@@ -195,14 +197,16 @@ void loop()
     }
     p << "\r\n";
 
-    if (len < 3 || len > lengthof(pn9)) {
+    if (len < 3) {
       p << F("Invalid packet length (") << len << ")" << "\r\n";
       return;
     }
 
     /* Dewhiten data */
-    for (int i = 0; i < len; ++i)
-      buf[i] ^= pn9[i];
+    if (xor_pn9(buf, len) < 0) {
+      p << F("Invalid packet length (") << len << ")" << "\r\n";
+      return;
+    }
 
     /* Calculate CRC (but don't include the CRC itself) */
     uint16_t crc = calc_crc(buf, len - 2);
