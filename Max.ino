@@ -96,7 +96,7 @@ void printStatus() {
   #ifdef KETTLE_RELAY_PIN
   lcd.home();
 
-  lcd << "Kettle: " << (kettle_status ? "On" : "Off");
+  lcd << F("Kettle: ") << (kettle_status ? F("On") : F("Off"));
   #endif // KETTLE_RELAY_PIN
   #endif // LCD_I2C
 
@@ -154,7 +154,7 @@ void setup()
   pinMode(KETTLE_RELAY_PIN, OUTPUT);
   #endif // KETTLE_RELAY_PIN
 
-  p << "Initialized" << "\r\n";
+  p << F("Initialized") << "\r\n";
   printStatus();
 }
 
@@ -172,7 +172,7 @@ void loop()
      * message while processing this one. */
     rf.setModeRx();
 
-    p << "Received " << len << " bytes" << "\r\n";
+    p << F("Received ") << len << F(" bytes") << "\r\n";
 
     /* Dump the raw received data */
     int i, j;
@@ -196,7 +196,7 @@ void loop()
     p << "\r\n";
 
     if (len < 3 || len > lengthof(pn9)) {
-      p << "Invalid packet length (" << len << ")" << "\r\n";
+      p << F("Invalid packet length (") << len << ")" << "\r\n";
       return;
     }
 
@@ -207,7 +207,7 @@ void loop()
     /* Calculate CRC (but don't include the CRC itself) */
     uint16_t crc = calc_crc(buf, len - 2);
     if (buf[len - 1] != (crc & 0xff) || buf[len - 2] != (crc >> 8)) {
-      p << "CRC error";
+      p << F("CRC error");
       return;
     }
 
@@ -215,7 +215,7 @@ void loop()
     MaxRFMessage *rfm = MaxRFMessage::parse(buf + 1, len - 3);
 
     if (rfm == NULL) {
-      p << "Packet is invalid" << "\r\n";
+      p << F("Packet is invalid") << "\r\n";
     } else {
       p << *rfm << "\r\n";
 

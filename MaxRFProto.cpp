@@ -18,31 +18,31 @@ static const char *display_mode_str[] = {
 
 /* MaxRFMessage */
 
-const char *MaxRFMessage::type_to_str(uint8_t type) {
+const FlashString *MaxRFMessage::type_to_str(uint8_t type) {
   switch(type) {
-    case 0x00: return "PairPing";
-    case 0x01: return "PairPong";
-    case 0x02: return "Ack";
-    case 0x03: return "TimeInformation";
-    case 0x10: return "ConfigWeekProfile";
-    case 0x11: return "ConfigTemperatures";
-    case 0x12: return "ConfigValve";
-    case 0x20: return "AddLinkPartner";
-    case 0x21: return "RemoveLinkPartner";
-    case 0x22: return "SetGroupId";
-    case 0x23: return "RemoveGroupId";
-    case 0x30: return "ShutterContactState";
-    case 0x40: return "SetTemperature";
-    case 0x42: return "WallThermostatState";
-    case 0x43: return "SetComfortTemperature";
-    case 0x44: return "SetEcoTemperature";
-    case 0x50: return "PushButtonState";
-    case 0x60: return "ThermostatState";
-    case 0x82: return "SetDisplayActualTemperature";
-    case 0xF1: return "WakeUp";
-    case 0xF0: return "Reset";
+    case 0x00: return F("PairPing");
+    case 0x01: return F("PairPong");
+    case 0x02: return F("Ack");
+    case 0x03: return F("TimeInformation");
+    case 0x10: return F("ConfigWeekProfile");
+    case 0x11: return F("ConfigTemperatures");
+    case 0x12: return F("ConfigValve");
+    case 0x20: return F("AddLinkPartner");
+    case 0x21: return F("RemoveLinkPartner");
+    case 0x22: return F("SetGroupId");
+    case 0x23: return F("RemoveGroupId");
+    case 0x30: return F("ShutterContactState");
+    case 0x40: return F("SetTemperature");
+    case 0x42: return F("WallThermostatState");
+    case 0x43: return F("SetComfortTemperature");
+    case 0x44: return F("SetEcoTemperature");
+    case 0x50: return F("PushButtonState");
+    case 0x60: return F("ThermostatState");
+    case 0x82: return F("SetDisplayActualTemperature");
+    case 0xF1: return F("WakeUp");
+    case 0xF0: return F("Reset");
   }
-  return "Unknown";
+  return F("Unknown");
 }
 
 MaxRFMessage *MaxRFMessage::create_message_from_type(uint8_t type) {
@@ -75,13 +75,13 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
 }
 
 size_t MaxRFMessage::printTo(Print &p) const {
-  p << V<Title>("Sequence num:") << V<Hex>(this->seqnum) << "\r\n";
-  p << V<Title>("Flags:") << V<Hex>(this->flags) << "\r\n";
-  p << V<Title>("Packet type:") << V<Hex>(this->type)
+  p << V<Title>(F("Sequence num:")) << V<Hex>(this->seqnum) << "\r\n";
+  p << V<Title>(F("Flags:")) << V<Hex>(this->flags) << "\r\n";
+  p << V<Title>(F("Packet type:")) << V<Hex>(this->type)
     << " (" << type_to_str(this->type) << ")" << "\r\n";
-  p << V<Title>("Packet from:") << V<Address>(this->addr_from) << "\r\n";
-  p << V<Title>("Packet to:") << V<Address>(this->addr_to) << "\r\n";
-  p << V<Title>("Group id:") << V<Hex>(this->group_id) << "\r\n";
+  p << V<Title>(F("Packet from:")) << V<Address>(this->addr_from) << "\r\n";
+  p << V<Title>(F("Packet to:")) << V<Address>(this->addr_to) << "\r\n";
+  p << V<Title>(F("Group id:")) << V<Hex>(this->group_id) << "\r\n";
 
   return 0; /* XXX */
 }
@@ -95,7 +95,7 @@ bool UnknownMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t UnknownMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
-  p << V<Title>("Payload:")
+  p << V<Title>(F("Payload:"))
     << V<Array<Hex, ' ', false>>(this->payload, this->payload_len)
     << "\r\n";
 }
@@ -119,10 +119,10 @@ bool SetTemperatureMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t SetTemperatureMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
-  p << V<Title>("Mode:") << mode_str[this->mode] << "\r\n";
-  p << V<Title>("Set temp:") << V<SetTemp>(this->set_temp) << "\r\n";
+  p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+  p << V<Title>(F("Set temp:")) << V<SetTemp>(this->set_temp) << "\r\n";
   if (this->until) {
-    p << V<Title>("Until:") << *(this->until) << "\r\n";
+    p << V<Title>(F("Until:")) << *(this->until) << "\r\n";
   }
 
   return 0; /* XXX */
@@ -142,8 +142,8 @@ bool WallThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t WallThermostatStateMessage::printTo(Print &p) const {
   MaxRFMessage::printTo(p);
-  p << V<Title>("Set temp:") << V<SetTemp>(this->set_temp) << "\r\n";
-  p << V<Title>("Actual temp:") << V<ActualTemp>(this->actual_temp) << "\r\n";
+  p << V<Title>(F("Set temp:")) << V<SetTemp>(this->set_temp) << "\r\n";
+  p << V<Title>(F("Actual temp:")) << V<ActualTemp>(this->actual_temp) << "\r\n";
 
   return 0; /* XXX */
 }
@@ -174,18 +174,18 @@ bool ThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t ThermostatStateMessage::printTo(Print &p) const {
   MaxRFMessage::printTo(p);
-  p << V<Title>("Mode:") << mode_str[this->mode] << "\r\n";
-  p << V<Title>("Adjust to DST:") << this->dst << "\r\n";
-  p << V<Title>("Locked:") << this->locked << "\r\n";
-  p << V<Title>("Battery Low:") << this->battery_low << "\r\n";
-  p << V<Title>("Valve position:") << this->valve_pos << "%" << "\r\n";
-  p << V<Title>("Set temp:") << V<SetTemp>(this->set_temp) << "\r\n";
+  p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+  p << V<Title>(F("Adjust to DST:")) << this->dst << "\r\n";
+  p << V<Title>(F("Locked:")) << this->locked << "\r\n";
+  p << V<Title>(F("Battery Low:")) << this->battery_low << "\r\n";
+  p << V<Title>(F("Valve position:")) << this->valve_pos << "%" << "\r\n";
+  p << V<Title>(F("Set temp:")) << V<SetTemp>(this->set_temp) << "\r\n";
 
   if (this->actual_temp)
-    p << V<Title>("Actual temp:") << V<ActualTemp>(this->actual_temp) << "\r\n";
+    p << V<Title>(F("Actual temp:")) << V<ActualTemp>(this->actual_temp) << "\r\n";
 
   if (this->until)
-    p << V<Title>("Until:") << *(this->until) << "\r\n";
+    p << V<Title>(F("Until:")) << *(this->until) << "\r\n";
 
   return 0; /* XXX */
 }
@@ -200,7 +200,7 @@ bool SetDisplayActualTemperatureMessage::parse_payload(const uint8_t *buf, size_
 
 size_t SetDisplayActualTemperatureMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
-  p << V<Title>("Display mode:") << display_mode_str[this->display_mode] << "\r\n";
+  p << V<Title>(F("Display mode:")) << display_mode_str[this->display_mode] << "\r\n";
 }
 
 /* UntilTime */

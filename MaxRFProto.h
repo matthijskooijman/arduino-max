@@ -5,6 +5,7 @@
 #include <Print.h>
 #include <TStreaming.h>
 
+#include "Max.h"
 #include "Util.h"
 
 const size_t RF_ADDR_SIZE = 24;
@@ -44,7 +45,7 @@ public:
   /**
    * Returns a string describing a given message type.
    */
-  static const char *type_to_str(uint8_t type);
+  static const FlashString *type_to_str(uint8_t type);
 
   virtual size_t printTo(Print &p) const;
 
