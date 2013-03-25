@@ -64,7 +64,7 @@ int xor_pn9(uint8_t *buf, size_t len) {
     return -1;
 
   for (int i = 0; i < len; ++i)
-    buf[i] ^= pgm_read_byte(pn9_table[i]);
+    buf[i] ^= pgm_read_byte(&pn9_table[i]);
 
   return 0;
 }
