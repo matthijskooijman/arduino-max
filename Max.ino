@@ -113,6 +113,22 @@ void printStatus() {
   #endif // LCD_I2C
 
   p << endl;
+
+  /* Print machine-parseable status line (to draw pretty graphs) */
+  p << "STATUS\t" << millis() << "\t";
+  for (int i = 0; i < lengthof(devices); ++i) {
+    struct device *d = &devices[i];
+    if (!d->address) break;
+    if (d->type != DEVICE_RADIATOR && d->type != DEVICE_WALL) continue;
+
+    p << V<ActualTemp>(d->actual_temp) << "\t" << V<SetTemp>(d->set_temp) << "\t";
+    if (d->type == DEVICE_RADIATOR)
+      p << V<ValvePos>(d->data.radiator.valve_pos);
+    else
+      p << "NA";
+    p << "\t";
+  }
+  p << (kettle_status ? "1" : "0") << endl;
 }
 
 #ifdef KETTLE_RELAY_PIN
