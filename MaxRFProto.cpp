@@ -194,7 +194,7 @@ size_t ThermostatStateMessage::printTo(Print &p) const {
 bool SetDisplayActualTemperatureMessage::parse_payload(const uint8_t *buf, size_t len) {
   if (len < 1)
     return NULL;
-  this->display_mode = (enum display_mode) ((buf[0] >> 5) & 0x1);
+  this->display_mode = (enum display_mode) ((buf[0] >> 2) & 0x1);
   return true;
 }
 
