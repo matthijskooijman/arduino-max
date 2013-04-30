@@ -94,7 +94,7 @@ public:
   virtual bool parse_payload(const uint8_t *buf, size_t len);
   virtual size_t printTo(Print &p) const;
 
-  uint8_t actual_temp; /* In 0.1° units */
+  uint16_t actual_temp; /* In 0.1° units */
   uint8_t set_temp; /* In 0.5° units */
 };
 
