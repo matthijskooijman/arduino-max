@@ -168,7 +168,9 @@ void setup()
 {
   Serial.begin(115200);
 
-  if (!rf.init())
+  if (rf.init())
+    Serial.println(F("RF init OK"));
+  else
     Serial.println(F("RF init failed"));
 
   #ifdef LCD_I2C
@@ -176,6 +178,8 @@ void setup()
   lcd.backlight();
   lcd.home();
   lcd.clear();
+  Serial.println(F("LCD init complete"));
+
   #endif // LCD_I2C
 
   #ifdef KETTLE_RELAY_PIN
