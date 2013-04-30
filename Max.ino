@@ -108,7 +108,7 @@ void printStatus() {
   #ifdef KETTLE_RELAY_PIN
   lcd.home();
 
-  lcd << F("Kettle: ") << (kettle_status ? F("On") : F("Off"));
+  (p & lcd) << F("Kettle: ") << (kettle_status ? F("On") : F("Off"));
   #endif // KETTLE_RELAY_PIN
   #endif // LCD_I2C
 
