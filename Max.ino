@@ -268,7 +268,7 @@ void loop()
     /* Calculate CRC (but don't include the CRC itself) */
     uint16_t crc = calc_crc(buf, len - 2);
     if (buf[len - 1] != (crc & 0xff) || buf[len - 2] != (crc >> 8)) {
-      p << F("CRC error");
+      p << F("CRC error") << "\r\n";
       return;
     }
 
