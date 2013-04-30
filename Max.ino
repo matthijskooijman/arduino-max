@@ -164,6 +164,29 @@ struct device *get_device(uint32_t addr, enum device_type type) {
   return NULL;
 }
 
+void dump_buffer(Print &p, uint8_t *buf, uint8_t len) {
+  /* Dump the raw received data */
+  int i, j;
+  for (i = 0; i < len; i += 16)
+  {
+    // Hex
+    for (j = 0; j < 16 && i+j < len; j++)
+    {
+      p << V<Hex>(buf[i+j]) << " ";
+    }
+    // Padding on last block
+    while (j++ < 16)
+      p << "   ";
+
+    p << "   ";
+    // ASCII
+    for (j = 0; j < 16 && i+j < len; j++)
+      p << (isprint(buf[i+j]) ? (char)buf[i+j] : '.');
+    p << "\r\n";
+  }
+  p << "\r\n";
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -226,26 +249,7 @@ void loop()
 
     p << F("Received ") << len << F(" bytes") << "\r\n";
 
-    /* Dump the raw received data */
-    int i, j;
-    for (i = 0; i < len; i += 16)
-    {
-      // Hex
-      for (j = 0; j < 16 && i+j < len; j++)
-      {
-        p << V<Hex>(buf[i+j]) << " ";
-      }
-      // Padding on last block
-      while (j++ < 16)
-        p << "   ";
-
-      p << "   ";
-      // ASCII
-      for (j = 0; j < 16 && i+j < len; j++)
-        p << (isprint(buf[i+j]) ? (char)buf[i+j] : '.');
-      p << "\r\n";
-    }
-    p << "\r\n";
+    dump_buffer(p, buf, len);
 
     if (len < 3) {
       p << F("Invalid packet length (") << len << ")" << "\r\n";
@@ -257,6 +261,9 @@ void loop()
       p << F("Invalid packet length (") << len << ")" << "\r\n";
       return;
     }
+
+    p << F("Dewhitened:") << "\r\n";
+    dump_buffer(p, buf, len);
 
     /* Calculate CRC (but don't include the CRC itself) */
     uint16_t crc = calc_crc(buf, len - 2);
