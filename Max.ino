@@ -205,13 +205,17 @@ void loop()
   uint8_t buf[RF22_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
 
-  if (Serial.read() != -1)
+  if (Serial.read() != -1) {
     Serial.println("OK");
+    printStatus();
+  }
 
   #ifdef ETHERNET
   EthernetClient c = server.available();
-  if (c && c.read() != -1)
+  if (c && c.read() != -1) {
     c.println("OK");
+    printStatus();
+  }
   #endif
 
   if (rf.recv(buf, &len))
