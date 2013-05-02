@@ -136,6 +136,7 @@ bool WallThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
 
   this->set_temp = buf[0] & 0x7f;
   this->actual_temp = ((buf[0] & 0x80) << 1) |  buf[1];
+  /* Note that mode and until time are not in this message */
 
   return true;
 }
@@ -227,13 +228,34 @@ Packet to:      000000
 Group id:       00
 Payload:        19 04 2A 00 CD
 
-04: Display mode?
 19: DST switch, mode = auto
     0:1 mode
-    3   DST switch
+    2   DST switch
+    5   ??
+04: Display mode?
 2A: set temp (21°)
-00: ?? Unused?
-CD: Actual temp (20.5°)
+00 CD: Actual temp (20.5°)
+
+Sequence num:   9C
+Flags:          04
+Packet type:    70 (Unknown)
+Packet from:    0298E5
+Packet to:      000000
+Group id:       00
+Payload:        12 04 24 48 0D 1B
+
+19: DST switch, mode = temporary
+    0:1 mode
+    2   DST switch
+    5   ??
+04: Display mode?
+24: set temp (18°)
+48 0D 1B: until time
+
+Perhaps 70 is really WallThermostatState and the curren WallThermostatState is
+more of a "update temp" message? It seems 70 is sent when the SetTemp of a WT
+changes.
+
 */
 
 /*
@@ -247,6 +269,9 @@ Group id:       00
 Payload:        00
 00: Disable
 01: Enable
+
+Sent to radiator thermostats only?
+
 */
 
 /*
@@ -257,10 +282,24 @@ Packet from:    0298E5
 Packet to:      04C8DD
 Group id:       00
 Payload:        01 11 00 28
-01: 1 == ack? 0 == nak??
-11: same as 11/19 in type 70?
-00: Valve position
+01: 1 == more data? 0 == no data??
+11: flags, same as 11/19 in type 70?
+00: Valve position / displaymode flags
 28: Set temp
+
+Sequence num:   1B
+Flags:          02
+Packet type:    02 (Ack)
+Packet from:    0298E5
+Packet to:      00B825
+Group id:       00
+Payload:        01 12 04 24 48 0D 1B
+
+01: 1 == more data? 0 == no data??
+11: flags, same as 11/19 in type 70? x2 == temporary
+00: Valve position / displaymode flags
+24: Set temp (18.0°)
+48 0D 1B: Until time
 */
 
 /* vim: set sw=2 sts=2 expandtab: */
