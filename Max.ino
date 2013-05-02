@@ -41,11 +41,14 @@ struct device {
   } data;
 };
 
+#define TEMP_UNKNOWN 0xff
+#define VALVE_UNKNOWN 0xff
+
 struct device devices[6] = {
-  {0x00b825, DEVICE_CUBE, "cube"},
-  {0x0298e5, DEVICE_WALL, "wall"},
-  {0x04c8dd, DEVICE_RADIATOR, "up  "},
-  {0x0131b4, DEVICE_RADIATOR, "down"},
+  {0x00b825, DEVICE_CUBE, "cube", TEMP_UNKNOWN, TEMP_UNKNOWN, 0},
+  {0x0298e5, DEVICE_WALL, "wall", TEMP_UNKNOWN, TEMP_UNKNOWN, 0},
+  {0x04c8dd, DEVICE_RADIATOR, "up  ", TEMP_UNKNOWN, TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
+  {0x0131b4, DEVICE_RADIATOR, "down", TEMP_UNKNOWN, TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
   0,
 };
 
@@ -138,6 +141,7 @@ void switchKettle() {
     struct device *d = &devices[i];
     if (!d->address) break;
     if (d->type != DEVICE_RADIATOR) continue;
+    if (d->data.radiator.valve_pos == VALVE_UNKNOWN) continue;
     total += d->data.radiator.valve_pos;
   }
 
