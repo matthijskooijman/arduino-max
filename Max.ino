@@ -99,7 +99,7 @@ void printStatus() {
     (p & lcd) << " " << V<ActualTemp>(d->actual_temp)
               << "/" << V<SetTemp>(d->set_temp);
     if (d->type == DEVICE_RADIATOR)
-      (p & lcd) << " " << d->data.radiator.valve_pos << "%";
+      (p & lcd) << " " << V<ValvePos>(d->data.radiator.valve_pos);
     p << endl;
   }
   p << endl;

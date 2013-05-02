@@ -16,6 +16,7 @@ const uint8_t VALVE_UNKNOWN = 0xff;
 typedef HexBits<RF_ADDR_SIZE> Address;
 typedef Fixed<10, 1> ActualTemp;
 typedef Fixed<2, 1> SetTemp;
+typedef Postfix<NoFormat, TChar<'%'>> ValvePos;
 
 enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST, MODE_UNKNOWN};
 enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
