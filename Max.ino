@@ -28,7 +28,7 @@ struct device {
   enum device_type type;
   const char *name;
   uint8_t set_temp; /* In 0.5° increments */
-  uint8_t actual_temp; /* In 0.1° increments */
+  uint16_t actual_temp; /* In 0.1° increments */
   unsigned long actual_temp_time; /* When was the actual_temp last updated */
   union {
     struct {
