@@ -13,10 +13,23 @@ const uint16_t ACTUAL_TEMP_UNKNOWN = 0xffff;
 const uint8_t SET_TEMP_UNKNOWN = 0xff;
 const uint8_t VALVE_UNKNOWN = 0xff;
 
+// Constant string with external linkage, so it can be passed as a
+// template param
+constexpr const char na[] = "NA";
+
 typedef HexBits<RF_ADDR_SIZE> Address;
-typedef Fixed<10, 1> ActualTemp;
-typedef Fixed<2, 1> SetTemp;
-typedef Postfix<NoFormat, TChar<'%'>> ValvePos;
+typedef SpecialValue<Fixed<10, 1>,
+                     TInt<ACTUAL_TEMP_UNKNOWN>,
+                     TStr<na>>
+        ActualTemp;
+typedef SpecialValue<Fixed<2, 1>,
+                     TInt<SET_TEMP_UNKNOWN>,
+                     TStr<na>>
+        SetTemp;
+typedef SpecialValue<Postfix<NoFormat, TChar<'%'>>,
+                     TInt<VALVE_UNKNOWN>,
+                     TStr<na>>
+        ValvePos;
 
 enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST, MODE_UNKNOWN};
 enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
