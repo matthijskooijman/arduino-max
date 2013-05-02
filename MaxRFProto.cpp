@@ -96,7 +96,7 @@ bool UnknownMessage::parse_payload(const uint8_t *buf, size_t len) {
 size_t UnknownMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
   p << V<Title>(F("Payload:"))
-    << V<Array<Hex, ' ', false>>(this->payload, this->payload_len)
+    << V<Array<Hex, TChar<' '>>>(this->payload, this->payload_len)
     << "\r\n";
 }
 
