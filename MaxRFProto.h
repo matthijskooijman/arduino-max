@@ -9,6 +9,9 @@
 #include "Util.h"
 
 const size_t RF_ADDR_SIZE = 24;
+const uint16_t ACTUAL_TEMP_UNKNOWN = 0xffff;
+const uint8_t SET_TEMP_UNKNOWN = 0xff;
+const uint8_t VALVE_UNKNOWN = 0xff;
 
 typedef HexBits<RF_ADDR_SIZE> Address;
 typedef Fixed<10, 1> ActualTemp;
