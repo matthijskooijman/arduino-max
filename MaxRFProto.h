@@ -34,7 +34,7 @@ typedef SpecialValue<Postfix<NoFormat, TChar<'%'>>,
 enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST, MODE_UNKNOWN};
 enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
 
-enum device_type {DEVICE_CUBE, DEVICE_WALL, DEVICE_RADIATOR};
+enum device_type {DEVICE_UNKNOWN, DEVICE_CUBE, DEVICE_WALL, DEVICE_RADIATOR};
 
 /**
  * Current state for a specific device.
