@@ -5,18 +5,6 @@
  * output. */
 typedef Align<16> Title;
 
-static const char *mode_str[] = {
-  [MODE_AUTO] = "auto",
-  [MODE_MANUAL] = "manual",
-  [MODE_TEMPORARY] = "temporary",
-  [MODE_BOOST] = "boost",
-};
-
-static const char *display_mode_str[] = {
-  [DISPLAY_SET_TEMP] = "Set temperature",
-  [DISPLAY_ACTUAL_TEMP] = "Actual temperature",
-};
-
 /**
  * Static list of known devices.
  */
@@ -46,6 +34,24 @@ static Device *get_device(uint32_t addr, enum device_type type) {
 }
 
 /* MaxRFMessage */
+
+const char *MaxRFMessage::mode_to_str(enum mode mode) {
+  switch (mode) {
+    case MODE_AUTO: return "auto";
+    case MODE_MANUAL: return "manual";
+    case MODE_TEMPORARY: return "temporary";
+    case MODE_BOOST: return "boost";
+    default: return "";
+  }
+};
+
+const char *MaxRFMessage::display_mode_to_str(enum display_mode display_mode) {
+  switch(display_mode) {
+    case DISPLAY_SET_TEMP: return "Set temperature";
+    case DISPLAY_ACTUAL_TEMP: return "Actual temperature";
+    default: return "";
+  }
+};
 
 const FlashString *MaxRFMessage::type_to_str(message_type type) {
   switch(type) {
@@ -172,7 +178,7 @@ bool SetTemperatureMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t SetTemperatureMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
-  p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+  p << V<Title>(F("Mode:")) << mode_to_str(this->mode) << "\r\n";
   p << V<Title>(F("Set temp:")) << V<SetTemp>(this->set_temp) << "\r\n";
   if (this->until) {
     p << V<Title>(F("Until:")) << *(this->until) << "\r\n";
@@ -235,7 +241,7 @@ bool ThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t ThermostatStateMessage::printTo(Print &p) const {
   MaxRFMessage::printTo(p);
-  p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+  p << V<Title>(F("Mode:")) << mode_to_str(this->mode) << "\r\n";
   p << V<Title>(F("Adjust to DST:")) << this->dst << "\r\n";
   p << V<Title>(F("Locked:")) << this->locked << "\r\n";
   p << V<Title>(F("Battery Low:")) << this->battery_low << "\r\n";
@@ -270,7 +276,7 @@ bool SetDisplayActualTemperatureMessage::parse_payload(const uint8_t *buf, size_
 
 size_t SetDisplayActualTemperatureMessage::printTo(Print &p) const{
   MaxRFMessage::printTo(p);
-  p << V<Title>(F("Display mode:")) << display_mode_str[this->display_mode] << "\r\n";
+  p << V<Title>(F("Display mode:")) << display_mode_to_str(this->display_mode) << "\r\n";
 }
 
 /* AckMessage */
@@ -302,7 +308,7 @@ bool AckMessage::parse_payload(const uint8_t *buf, size_t len) {
 size_t AckMessage::printTo(Print &p) const {
   MaxRFMessage::printTo(p);
   if (this->from && this->from->type == DEVICE_RADIATOR) {
-    p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+    p << V<Title>(F("Mode:")) << mode_to_str(this->mode) << "\r\n";
     p << V<Title>(F("Adjust to DST:")) << this->dst << "\r\n";
     p << V<Title>(F("Locked:")) << this->locked << "\r\n";
     p << V<Title>(F("Battery Low:")) << this->battery_low << "\r\n";
