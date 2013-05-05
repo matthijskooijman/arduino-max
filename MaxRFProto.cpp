@@ -120,8 +120,14 @@ size_t MaxRFMessage::printTo(Print &p) const {
   p << V<Title>(F("Flags:")) << V<Hex>(this->flags) << "\r\n";
   p << V<Title>(F("Packet type:")) << V<Hex>(this->type)
     << " (" << type_to_str(this->type) << ")" << "\r\n";
-  p << V<Title>(F("Packet from:")) << V<Address>(this->addr_from) << "\r\n";
-  p << V<Title>(F("Packet to:")) << V<Address>(this->addr_to) << "\r\n";
+  p << V<Title>(F("Packet from:")) << V<Address>(this->addr_from);
+  if (this->from)
+    p << " (" << this->from->name << ")";
+  p << "\r\n";
+  p << V<Title>(F("Packet to:")) << V<Address>(this->addr_to);
+  if (this->to)
+    p << " (" << this->to->name << ")";
+  p << "\r\n";
   p << V<Title>(F("Group id:")) << V<Hex>(this->group_id) << "\r\n";
 
   return 0; /* XXX */
