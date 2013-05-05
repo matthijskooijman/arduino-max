@@ -23,7 +23,8 @@ enum device_type {
   DEVICE_RADIATOR,
 };
 
-struct device {
+class Device {
+public:
   uint32_t address;
   enum device_type type;
   const char *name;
@@ -41,7 +42,7 @@ struct device {
   } data;
 };
 
-struct device devices[6] = {
+Device devices[6] = {
   {0x00b825, DEVICE_CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
   {0x0298e5, DEVICE_WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
   {0x04c8dd, DEVICE_RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
@@ -80,7 +81,7 @@ void printStatus() {
   lcd.clear();
   #endif
   for (int i = 0; i < lengthof(devices); ++i) {
-    struct device *d = &devices[i];
+    Device *d = &devices[i];
     if (!d->address) break;
     if (d->type != DEVICE_RADIATOR && d->type != DEVICE_WALL) continue;
 
@@ -117,7 +118,7 @@ void printStatus() {
   /* Print machine-parseable status line (to draw pretty graphs) */
   p << "STATUS\t" << millis() << "\t";
   for (int i = 0; i < lengthof(devices); ++i) {
-    struct device *d = &devices[i];
+    Device *d = &devices[i];
     if (!d->address) break;
     if (d->type != DEVICE_RADIATOR && d->type != DEVICE_WALL) continue;
 
@@ -135,7 +136,7 @@ void printStatus() {
 void switchKettle() {
   uint32_t total = 0;
   for (int i = 0; i < lengthof(devices); ++i) {
-    struct device *d = &devices[i];
+    Device *d = &devices[i];
     if (!d->address) break;
     if (d->type != DEVICE_RADIATOR) continue;
     if (d->data.radiator.valve_pos == VALVE_UNKNOWN) continue;
@@ -149,7 +150,7 @@ void switchKettle() {
 #endif // KETTLE_RELAY_PIN
 
 /* Find or assign a device struct based on the address */
-struct device *get_device(uint32_t addr, enum device_type type) {
+Device *get_device(uint32_t addr, enum device_type type) {
   for (int i = 0; i < lengthof(devices); ++i) {
     /* The address is not in the list yet, assign this empty slot. */
     if (devices[i].address == 0) {
@@ -284,13 +285,13 @@ void loop()
       /* Update internal state from some messages */
       if (rfm->type == 0x42) { /* WallThermostatState */
         WallThermostatStateMessage *m = (WallThermostatStateMessage*)rfm;
-        struct device *d = get_device(m->addr_from, DEVICE_WALL);
+        Device *d = get_device(m->addr_from, DEVICE_WALL);
         d->set_temp = m->set_temp;
         d->actual_temp = m->actual_temp;
         d->actual_temp_time = millis();
       } else if (rfm->type == 0x60) { /* ThermostateState */
         ThermostatStateMessage *m = (ThermostatStateMessage*)rfm;
-        struct device *d = get_device(m->addr_from, DEVICE_RADIATOR);
+        Device *d = get_device(m->addr_from, DEVICE_RADIATOR);
         d->set_temp = m->set_temp;
         d->data.radiator.valve_pos = m->valve_pos;
         if (m->actual_temp) {
