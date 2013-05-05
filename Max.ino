@@ -116,23 +116,6 @@ void switchKettle() {
 }
 #endif // KETTLE_RELAY_PIN
 
-/* Find or assign a device struct based on the address */
-Device *get_device(uint32_t addr, enum device_type type) {
-  for (int i = 0; i < lengthof(devices); ++i) {
-    /* The address is not in the list yet, assign this empty slot. */
-    if (devices[i].address == 0) {
-      devices[i].address = addr;
-      devices[i].type = type;
-      devices[i].name = NULL;
-    }
-    /* Found it */
-    if (devices[i].address == addr)
-      return &devices[i];
-  }
-  /* Not found and no slots left */
-  return NULL;
-}
-
 void dump_buffer(Print &p, uint8_t *buf, uint8_t len) {
   /* Dump the raw received data */
   int i, j;
@@ -252,18 +235,16 @@ void loop()
       /* Update internal state from some messages */
       if (rfm->type == 0x42) { /* WallThermostatState */
         WallThermostatStateMessage *m = (WallThermostatStateMessage*)rfm;
-        Device *d = get_device(m->addr_from, DEVICE_WALL);
-        d->set_temp = m->set_temp;
-        d->actual_temp = m->actual_temp;
-        d->actual_temp_time = millis();
+        m->from->set_temp = m->set_temp;
+        m->from->actual_temp = m->actual_temp;
+        m->from->actual_temp_time = millis();
       } else if (rfm->type == 0x60) { /* ThermostateState */
         ThermostatStateMessage *m = (ThermostatStateMessage*)rfm;
-        Device *d = get_device(m->addr_from, DEVICE_RADIATOR);
-        d->set_temp = m->set_temp;
-        d->data.radiator.valve_pos = m->valve_pos;
+        m->from->set_temp = m->set_temp;
+        m->from->data.radiator.valve_pos = m->valve_pos;
         if (m->actual_temp) {
-          d->actual_temp = m->actual_temp;
-          d->actual_temp_time = millis();
+          m->from->actual_temp = m->actual_temp;
+          m->from->actual_temp_time = millis();
         }
       }
     }

@@ -27,6 +27,22 @@ Device devices[] = {
   0,
 };
 
+/* Find or assign a device struct based on the address */
+static Device *get_device(uint32_t addr, enum device_type type) {
+  for (int i = 0; i < lengthof(devices); ++i) {
+    /* The address is not in the list yet, assign this empty slot. */
+    if (devices[i].address == 0) {
+      devices[i].address = addr;
+      devices[i].type = type;
+      devices[i].name = NULL;
+    }
+    /* Found it */
+    if (devices[i].address == addr)
+      return &devices[i];
+  }
+  /* Not found and no slots left */
+  return NULL;
+}
 
 /* MaxRFMessage */
 
@@ -57,6 +73,15 @@ const FlashString *MaxRFMessage::type_to_str(message_type type) {
   }
 }
 
+device_type MaxRFMessage::message_type_to_sender_type(message_type type) {
+  switch(type) {
+    case WALL_THERMOSTAT_STATE:          return DEVICE_WALL;
+    case THERMOSTAT_STATE:               return DEVICE_RADIATOR;
+    case SET_DISPLAY_ACTUAL_TEMPERATURE: return DEVICE_CUBE;
+    default:                             return DEVICE_UNKNOWN;
+  }
+}
+
 MaxRFMessage *MaxRFMessage::create_message_from_type(message_type type) {
   switch(type) {
     case SET_TEMPERATURE:                return new SetTemperatureMessage();
@@ -80,6 +105,10 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
   m->addr_from = getBits(buf + 3, 0, RF_ADDR_SIZE);
   m->addr_to = getBits(buf + 6, 0, RF_ADDR_SIZE);
   m->group_id = buf[9];
+
+  m->from = get_device(m->addr_from, message_type_to_sender_type(type));
+  m->to = get_device(m->addr_to, DEVICE_UNKNOWN);
+
   if (m->parse_payload(buf + 10, len - 10))
     return m;
   else

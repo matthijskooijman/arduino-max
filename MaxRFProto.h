@@ -126,9 +126,16 @@ public:
   uint32_t addr_to;
   uint8_t group_id;
 
+
+  /* The devices adressed, or NULL for broadcast messages or unknown
+   * devices. */
+  Device *from;
+  Device *to;
+
   virtual ~MaxRFMessage() {}
 private:
   static MaxRFMessage *create_message_from_type(message_type type);
+  static device_type message_type_to_sender_type(message_type type);
   virtual bool parse_payload(const uint8_t *buf, size_t len) = 0;
 };
 
