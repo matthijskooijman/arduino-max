@@ -16,6 +16,18 @@ static const char *display_mode_str[] = {
   [DISPLAY_ACTUAL_TEMP] = "Actual temperature",
 };
 
+/**
+ * Static list of known devices.
+ */
+Device devices[] = {
+  {0x00b825, DEVICE_CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  {0x0298e5, DEVICE_WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  {0x04c8dd, DEVICE_RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
+  {0x0131b4, DEVICE_RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
+  0,
+};
+
+
 /* MaxRFMessage */
 
 const FlashString *MaxRFMessage::type_to_str(uint8_t type) {

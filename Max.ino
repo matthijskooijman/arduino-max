@@ -17,39 +17,6 @@
 
 static_assert(PN9_LEN >= RF22_MAX_MESSAGE_LEN, "Not enough pn9 bytes defined");
 
-enum device_type {
-  DEVICE_CUBE,
-  DEVICE_WALL,
-  DEVICE_RADIATOR,
-};
-
-class Device {
-public:
-  uint32_t address;
-  enum device_type type;
-  const char *name;
-  uint8_t set_temp; /* In 0.5° increments */
-  uint16_t actual_temp; /* In 0.1° increments */
-  unsigned long actual_temp_time; /* When was the actual_temp last updated */
-  union {
-    struct {
-      enum mode mode;
-      uint8_t valve_pos; /* 0-64 (inclusive) */
-    } radiator;
-
-    struct {
-    } wall;
-  } data;
-};
-
-Device devices[6] = {
-  {0x00b825, DEVICE_CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x0298e5, DEVICE_WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x04c8dd, DEVICE_RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
-  {0x0131b4, DEVICE_RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
-  0,
-};
-
 MaxRF22 rf(9);
 
 #ifdef LCD_I2C

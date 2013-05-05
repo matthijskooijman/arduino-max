@@ -34,6 +34,35 @@ typedef SpecialValue<Postfix<NoFormat, TChar<'%'>>,
 enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST, MODE_UNKNOWN};
 enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
 
+enum device_type {DEVICE_CUBE, DEVICE_WALL, DEVICE_RADIATOR};
+
+/**
+ * Current state for a specific device.
+ */
+class Device {
+public:
+  uint32_t address;
+  enum device_type type;
+  const char *name;
+  uint8_t set_temp; /* In 0.5° increments */
+  uint16_t actual_temp; /* In 0.1° increments */
+  unsigned long actual_temp_time; /* When was the actual_temp last updated */
+  union {
+    struct {
+      enum mode mode;
+      uint8_t valve_pos; /* 0-64 (inclusive) */
+    } radiator;
+
+    struct {
+    } wall;
+  } data;
+};
+
+/*
+ * Known devices, terminated with a NULL entry.
+ */
+extern Device devices[6];
+
 class UntilTime : public Printable {
 public:
   /* Parse an until time from three bytes from an RF packet */
