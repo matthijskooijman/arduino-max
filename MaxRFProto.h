@@ -31,12 +31,12 @@ typedef SpecialValue<Postfix<NoFormat, TChar<'%'>>,
                      TStr<na>>
         ValvePos;
 
-enum mode {MODE_AUTO, MODE_MANUAL, MODE_TEMPORARY, MODE_BOOST, MODE_UNKNOWN};
-enum display_mode {DISPLAY_SET_TEMP, DISPLAY_ACTUAL_TEMP};
+enum class Mode {AUTO, MANUAL, TEMPORARY, BOOST, UNKNOWN};
+enum class DisplayMode {SET_TEMP, ACTUAL_TEMP};
 
-enum device_type {DEVICE_UNKNOWN, DEVICE_CUBE, DEVICE_WALL, DEVICE_RADIATOR};
+enum class DeviceType {UNKNOWN, CUBE, WALL, RADIATOR};
 
-enum message_type {
+enum class MessageType {
   PAIR_PING                      = 0x00,
   PAIR_PONG                      = 0x01,
   ACK                            = 0x02,
@@ -66,14 +66,14 @@ enum message_type {
 class Device {
 public:
   uint32_t address;
-  enum device_type type;
+  DeviceType type;
   const char *name;
   uint8_t set_temp; /* In 0.5° increments */
   uint16_t actual_temp; /* In 0.1° increments */
   unsigned long actual_temp_time; /* When was the actual_temp last updated */
   union {
     struct {
-      enum mode mode;
+      Mode mode;
       uint8_t valve_pos; /* 0-64 (inclusive) */
     } radiator;
 
@@ -115,9 +115,9 @@ public:
   /**
    * Returns a string describing a given message type.
    */
-  static const FlashString *type_to_str(message_type type);
-  static const FlashString *mode_to_str(enum mode mode);
-  static const FlashString *display_mode_to_str(enum display_mode display_mode);
+  static const FlashString *type_to_str(MessageType type);
+  static const FlashString *mode_to_str(Mode mode);
+  static const FlashString *display_mode_to_str(DisplayMode display_mode);
 
   virtual size_t printTo(Print &p) const;
 
@@ -128,7 +128,7 @@ public:
 
   uint8_t seqnum;
   uint8_t flags;
-  message_type type;
+  MessageType type;
   uint32_t addr_from;
   uint32_t addr_to;
   uint8_t group_id;
@@ -141,8 +141,8 @@ public:
 
   virtual ~MaxRFMessage() {}
 private:
-  static MaxRFMessage *create_message_from_type(message_type type);
-  static device_type message_type_to_sender_type(message_type type);
+  static MaxRFMessage *create_message_from_type(MessageType type);
+  static DeviceType message_type_to_sender_type(MessageType type);
   virtual bool parse_payload(const uint8_t *buf, size_t len) = 0;
 };
 
@@ -166,7 +166,7 @@ public:
   virtual size_t printTo(Print &p) const;
 
   uint8_t set_temp; /* In 0.5° units */
-  enum mode mode;
+  Mode mode;
 
   UntilTime *until; /* Only when mode is MODE_TEMPORARY */
 
@@ -192,7 +192,7 @@ public:
   bool dst;
   bool locked;
   bool battery_low;
-  enum mode mode;
+  Mode mode;
   uint8_t valve_pos; /* In percent */
   uint8_t set_temp; /* In 0.5° units */
   uint8_t actual_temp; /* In 0.1° units, 0 when not present */
@@ -205,7 +205,7 @@ public:
   virtual bool parse_payload(const uint8_t *buf, size_t len);
   virtual size_t printTo(Print &p) const;
 
-  enum display_mode display_mode;
+  DisplayMode display_mode;
 };
 
 class AckMessage : public MaxRFMessage {
@@ -217,7 +217,7 @@ public:
   bool dst;
   bool locked;
   bool battery_low;
-  enum mode mode;
+  Mode mode;
   uint8_t valve_pos; /* In percent */
   uint8_t set_temp; /* In 0.5° units */
   UntilTime *until; /* Only when mode is MODE_TEMPORARY */

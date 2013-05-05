@@ -50,7 +50,7 @@ void printStatus() {
   for (int i = 0; i < lengthof(devices); ++i) {
     Device *d = &devices[i];
     if (!d->address) break;
-    if (d->type != DEVICE_RADIATOR && d->type != DEVICE_WALL) continue;
+    if (d->type != DeviceType::RADIATOR && d->type != DeviceType::WALL) continue;
 
     #ifdef LCD_I2C
     lcd.setCursor(0, row--);
@@ -66,7 +66,7 @@ void printStatus() {
 
     (p & lcd) << " " << V<ActualTemp>(d->actual_temp)
               << "/" << V<SetTemp>(d->set_temp);
-    if (d->type == DEVICE_RADIATOR)
+    if (d->type == DeviceType::RADIATOR)
       (p & lcd) << " " << V<ValvePos>(d->data.radiator.valve_pos);
     p << endl;
   }
@@ -87,10 +87,10 @@ void printStatus() {
   for (int i = 0; i < lengthof(devices); ++i) {
     Device *d = &devices[i];
     if (!d->address) break;
-    if (d->type != DEVICE_RADIATOR && d->type != DEVICE_WALL) continue;
+    if (d->type != DeviceType::RADIATOR && d->type != DeviceType::WALL) continue;
 
     p << V<ActualTemp>(d->actual_temp) << "\t" << V<SetTemp>(d->set_temp) << "\t";
-    if (d->type == DEVICE_RADIATOR)
+    if (d->type == DeviceType::RADIATOR)
       p << V<ValvePos>(d->data.radiator.valve_pos);
     else
       p << "NA";
@@ -105,7 +105,7 @@ void switchKettle() {
   for (int i = 0; i < lengthof(devices); ++i) {
     Device *d = &devices[i];
     if (!d->address) break;
-    if (d->type != DEVICE_RADIATOR) continue;
+    if (d->type != DeviceType::RADIATOR) continue;
     if (d->data.radiator.valve_pos == VALVE_UNKNOWN) continue;
     total += d->data.radiator.valve_pos;
   }

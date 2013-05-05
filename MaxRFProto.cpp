@@ -9,15 +9,15 @@ typedef Align<16> Title;
  * Static list of known devices.
  */
 Device devices[] = {
-  {0x00b825, DEVICE_CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x0298e5, DEVICE_WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x04c8dd, DEVICE_RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
-  {0x0131b4, DEVICE_RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {MODE_UNKNOWN, VALVE_UNKNOWN}}},
+  {0x00b825, DeviceType::CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  {0x0298e5, DeviceType::WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  {0x04c8dd, DeviceType::RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
+  {0x0131b4, DeviceType::RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
   0,
 };
 
 /* Find or assign a device struct based on the address */
-static Device *get_device(uint32_t addr, enum device_type type) {
+static Device *get_device(uint32_t addr, DeviceType type) {
   for (int i = 0; i < lengthof(devices); ++i) {
     /* The address is not in the list yet, assign this empty slot. */
     if (devices[i].address == 0 && addr != 0) {
@@ -34,68 +34,67 @@ static Device *get_device(uint32_t addr, enum device_type type) {
 }
 
 /* MaxRFMessage */
-
-const FlashString *MaxRFMessage::mode_to_str(enum mode mode) {
+const FlashString *MaxRFMessage::mode_to_str(Mode mode) {
   switch (mode) {
-    case MODE_AUTO: return F("auto");
-    case MODE_MANUAL: return F("manual");
-    case MODE_TEMPORARY: return F("temporary");
-    case MODE_BOOST: return F("boost");
+    case Mode::AUTO: return F("auto");
+    case Mode::MANUAL: return F("manual");
+    case Mode::TEMPORARY: return F("temporary");
+    case Mode::BOOST: return F("boost");
     default: return F("");
   }
 };
 
-const FlashString *MaxRFMessage::display_mode_to_str(enum display_mode display_mode) {
+const FlashString *MaxRFMessage::display_mode_to_str(DisplayMode display_mode) {
   switch(display_mode) {
-    case DISPLAY_SET_TEMP: return F("Set temperature");
-    case DISPLAY_ACTUAL_TEMP: return F("Actual temperature");
+    case DisplayMode::SET_TEMP: return F("Set temperature");
+    case DisplayMode::ACTUAL_TEMP: return F("Actual temperature");
     default: return F("");
   }
 };
 
-const FlashString *MaxRFMessage::type_to_str(message_type type) {
+const FlashString *MaxRFMessage::type_to_str(MessageType type) {
   switch(type) {
-    case PAIR_PING:                      return F("PairPing");
-    case PAIR_PONG:                      return F("PairPong");
-    case ACK:                            return F("Ack");
-    case TIME_INFORMATION:               return F("TimeInformation");
-    case CONFIG_WEEK_PROFILE:            return F("ConfigWeekProfile");
-    case CONFIG_TEMPERATURES:            return F("ConfigTemperatures");
-    case CONFIG_VALVE:                   return F("ConfigValve");
-    case ADD_LINK_PARTNER:               return F("AddLinkPartner");
-    case REMOVE_LINK_PARTNER:            return F("RemoveLinkPartner");
-    case SET_GROUP_ID:                   return F("SetGroupId");
-    case REMOVE_GROUP_ID:                return F("RemoveGroupId");
-    case SHUTTER_CONTACT_STATE:          return F("ShutterContactState");
-    case SET_TEMPERATURE:                return F("SetTemperature");
-    case WALL_THERMOSTAT_STATE:          return F("WallThermostatState");
-    case SET_COMFORT_TEMPERATURE:        return F("SetComfortTemperature");
-    case SET_ECO_TEMPERATURE:            return F("SetEcoTemperature");
-    case PUSH_BUTTON_STATE:              return F("PushButtonState");
-    case THERMOSTAT_STATE:               return F("ThermostatState");
-    case SET_DISPLAY_ACTUAL_TEMPERATURE: return F("SetDisplayActualTemperature");
-    case WAKE_UP:                        return F("WakeUp");
-    case RESET:                          return F("Reset");
+    case MessageType::PAIR_PING:                      return F("PairPing");
+    case MessageType::PAIR_PONG:                      return F("PairPong");
+    case MessageType::ACK:                            return F("Ack");
+    case MessageType::TIME_INFORMATION:               return F("TimeInformation");
+    case MessageType::CONFIG_WEEK_PROFILE:            return F("ConfigWeekProfile");
+    case MessageType::CONFIG_TEMPERATURES:            return F("ConfigTemperatures");
+    case MessageType::CONFIG_VALVE:                   return F("ConfigValve");
+    case MessageType::ADD_LINK_PARTNER:               return F("AddLinkPartner");
+    case MessageType::REMOVE_LINK_PARTNER:            return F("RemoveLinkPartner");
+    case MessageType::SET_GROUP_ID:                   return F("SetGroupId");
+    case MessageType::REMOVE_GROUP_ID:                return F("RemoveGroupId");
+    case MessageType::SHUTTER_CONTACT_STATE:          return F("ShutterContactState");
+    case MessageType::SET_TEMPERATURE:                return F("SetTemperature");
+    case MessageType::WALL_THERMOSTAT_STATE:          return F("WallThermostatState");
+    case MessageType::SET_COMFORT_TEMPERATURE:        return F("SetComfortTemperature");
+    case MessageType::SET_ECO_TEMPERATURE:            return F("SetEcoTemperature");
+    case MessageType::PUSH_BUTTON_STATE:              return F("PushButtonState");
+    case MessageType::THERMOSTAT_STATE:               return F("ThermostatState");
+    case MessageType::SET_DISPLAY_ACTUAL_TEMPERATURE: return F("SetDisplayActualTemperature");
+    case MessageType::WAKE_UP:                        return F("WakeUp");
+    case MessageType::RESET:                          return F("Reset");
     default:                             return F("Unknown");
   }
 }
 
-device_type MaxRFMessage::message_type_to_sender_type(message_type type) {
+DeviceType MaxRFMessage::message_type_to_sender_type(MessageType type) {
   switch(type) {
-    case WALL_THERMOSTAT_STATE:          return DEVICE_WALL;
-    case THERMOSTAT_STATE:               return DEVICE_RADIATOR;
-    case SET_DISPLAY_ACTUAL_TEMPERATURE: return DEVICE_CUBE;
-    default:                             return DEVICE_UNKNOWN;
+    case MessageType::WALL_THERMOSTAT_STATE:          return DeviceType::WALL;
+    case MessageType::THERMOSTAT_STATE:               return DeviceType::RADIATOR;
+    case MessageType::SET_DISPLAY_ACTUAL_TEMPERATURE: return DeviceType::CUBE;
+    default:                             return DeviceType::UNKNOWN;
   }
 }
 
-MaxRFMessage *MaxRFMessage::create_message_from_type(message_type type) {
+MaxRFMessage *MaxRFMessage::create_message_from_type(MessageType type) {
   switch(type) {
-    case SET_TEMPERATURE:                return new SetTemperatureMessage();
-    case WALL_THERMOSTAT_STATE:          return new WallThermostatStateMessage();
-    case THERMOSTAT_STATE:               return new ThermostatStateMessage();
-    case SET_DISPLAY_ACTUAL_TEMPERATURE: return new SetDisplayActualTemperatureMessage();
-    case ACK:                            return new AckMessage();
+    case MessageType::SET_TEMPERATURE:                return new SetTemperatureMessage();
+    case MessageType::WALL_THERMOSTAT_STATE:          return new WallThermostatStateMessage();
+    case MessageType::THERMOSTAT_STATE:               return new ThermostatStateMessage();
+    case MessageType::SET_DISPLAY_ACTUAL_TEMPERATURE: return new SetDisplayActualTemperatureMessage();
+    case MessageType::ACK:                            return new AckMessage();
     default:                             return new UnknownMessage();
   }
 }
@@ -104,7 +103,7 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
   if (len < 10)
     return NULL;
 
-  message_type type = (message_type)buf[2];
+  MessageType type = (MessageType)buf[2];
   MaxRFMessage *m = create_message_from_type(type);
 
   m->seqnum = buf[0];
@@ -115,7 +114,7 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
   m->group_id = buf[9];
 
   m->from = get_device(m->addr_from, message_type_to_sender_type(type));
-  m->to = get_device(m->addr_to, DEVICE_UNKNOWN);
+  m->to = get_device(m->addr_to, DeviceType::UNKNOWN);
 
   if (m->parse_payload(buf + 10, len - 10))
     return m;
@@ -166,7 +165,7 @@ bool SetTemperatureMessage::parse_payload(const uint8_t *buf, size_t len) {
     return false;
 
   this->set_temp = buf[0] & 0x3f;
-  this->mode = (enum mode) ((buf[0] >> 6) & 0x3);
+  this->mode = (Mode) ((buf[0] >> 6) & 0x3);
 
   if (len >= 4)
     this->until = new UntilTime(buf + 1);
@@ -221,7 +220,7 @@ bool ThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
   if (len < 3)
     return false;
 
-  this->mode = (enum mode) (buf[0] & 0x3);
+  this->mode = (Mode) (buf[0] & 0x3);
   this->dst = (buf[0] >> 2) & 0x1;
   this->locked = (buf[0] >> 5) & 0x1;
   this->battery_low = (buf[0] >> 7) & 0x1;
@@ -229,11 +228,11 @@ bool ThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
   this->set_temp = buf[2];
 
   this->actual_temp = 0;
-  if (this->mode != MODE_TEMPORARY && len >= 5)
+  if (this->mode != Mode::TEMPORARY && len >= 5)
     this->actual_temp = ((buf[3] & 0x1) << 8) + buf[4];
 
   this->until = NULL;
-  if (this->mode == MODE_TEMPORARY && len >= 6)
+  if (this->mode == Mode::TEMPORARY && len >= 6)
     this->until = new UntilTime(buf + 3);
 
   return true;
@@ -270,7 +269,7 @@ void ThermostatStateMessage::updateState() {
 bool SetDisplayActualTemperatureMessage::parse_payload(const uint8_t *buf, size_t len) {
   if (len < 1)
     return NULL;
-  this->display_mode = (enum display_mode) ((buf[0] >> 2) & 0x1);
+  this->display_mode = (DisplayMode) ((buf[0] >> 2) & 0x1);
   return true;
 }
 
@@ -285,10 +284,10 @@ bool AckMessage::parse_payload(const uint8_t *buf, size_t len) {
     return false;
 
   /* XXX: Perhaps buf[0] == 0x01 can be used here instead? */
-  if (this->from && this->from->type == DEVICE_RADIATOR) {
+  if (this->from && this->from->type == DeviceType::RADIATOR) {
     /* We only know about packet formats sent by radiators yet */
 
-    this->mode = (enum mode) (buf[1] & 0x3);
+    this->mode = (Mode) (buf[1] & 0x3);
     this->dst = (buf[1] >> 2) & 0x1;
     /* The locked and battery_low bits are unconfirmed, but they probably
      * match the RadiatorThermostateStateMessage. */
@@ -298,7 +297,7 @@ bool AckMessage::parse_payload(const uint8_t *buf, size_t len) {
     this->set_temp = buf[3];
 
     this->until = NULL;
-    if (this->mode == MODE_TEMPORARY && len >= 7)
+    if (this->mode == Mode::TEMPORARY && len >= 7)
       this->until = new UntilTime(buf + 4);
   }
 
@@ -307,7 +306,7 @@ bool AckMessage::parse_payload(const uint8_t *buf, size_t len) {
 
 size_t AckMessage::printTo(Print &p) const {
   MaxRFMessage::printTo(p);
-  if (this->from && this->from->type == DEVICE_RADIATOR) {
+  if (this->from && this->from->type == DeviceType::RADIATOR) {
     p << V<Title>(F("Mode:")) << mode_to_str(this->mode) << "\r\n";
     p << V<Title>(F("Adjust to DST:")) << this->dst << "\r\n";
     p << V<Title>(F("Locked:")) << this->locked << "\r\n";
@@ -323,7 +322,7 @@ size_t AckMessage::printTo(Print &p) const {
 }
 
 void AckMessage::updateState() {
-  if (this->from && this->from->type == DEVICE_RADIATOR) {
+  if (this->from && this->from->type == DeviceType::RADIATOR) {
     this->from->set_temp = this->set_temp;
     this->from->data.radiator.valve_pos = this->valve_pos;
   }
