@@ -32,7 +32,7 @@ Device devices[] = {
 static Device *get_device(uint32_t addr, enum device_type type) {
   for (int i = 0; i < lengthof(devices); ++i) {
     /* The address is not in the list yet, assign this empty slot. */
-    if (devices[i].address == 0) {
+    if (devices[i].address == 0 && addr != 0) {
       devices[i].address = addr;
       devices[i].type = type;
       devices[i].name = NULL;
