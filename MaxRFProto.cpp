@@ -9,11 +9,11 @@ typedef Align<16> Title;
  * Static list of known devices.
  */
 Device devices[] = {
-  {0x00b825, DeviceType::CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x0298e5, DeviceType::WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
-  {0x04c8dd, DeviceType::RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
-  {0x0131b4, DeviceType::RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
-  0,
+  /* Add your devices here, for example: */
+  //{0x00b825, DeviceType::CUBE, "cube", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  //{0x0298e5, DeviceType::WALL, "wall", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0},
+  //{0x04c8dd, DeviceType::RADIATOR, "up  ", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
+  //{0x0131b4, DeviceType::RADIATOR, "down", SET_TEMP_UNKNOWN, ACTUAL_TEMP_UNKNOWN, 0, {.radiator = {Mode::UNKNOWN, VALVE_UNKNOWN}}},
 };
 
 /* Find or assign a device struct based on the address */
