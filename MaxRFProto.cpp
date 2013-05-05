@@ -35,21 +35,21 @@ static Device *get_device(uint32_t addr, enum device_type type) {
 
 /* MaxRFMessage */
 
-const char *MaxRFMessage::mode_to_str(enum mode mode) {
+const FlashString *MaxRFMessage::mode_to_str(enum mode mode) {
   switch (mode) {
-    case MODE_AUTO: return "auto";
-    case MODE_MANUAL: return "manual";
-    case MODE_TEMPORARY: return "temporary";
-    case MODE_BOOST: return "boost";
-    default: return "";
+    case MODE_AUTO: return F("auto");
+    case MODE_MANUAL: return F("manual");
+    case MODE_TEMPORARY: return F("temporary");
+    case MODE_BOOST: return F("boost");
+    default: return F("");
   }
 };
 
-const char *MaxRFMessage::display_mode_to_str(enum display_mode display_mode) {
+const FlashString *MaxRFMessage::display_mode_to_str(enum display_mode display_mode) {
   switch(display_mode) {
-    case DISPLAY_SET_TEMP: return "Set temperature";
-    case DISPLAY_ACTUAL_TEMP: return "Actual temperature";
-    default: return "";
+    case DISPLAY_SET_TEMP: return F("Set temperature");
+    case DISPLAY_ACTUAL_TEMP: return F("Actual temperature");
+    default: return F("");
   }
 };
 

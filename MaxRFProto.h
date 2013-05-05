@@ -116,8 +116,8 @@ public:
    * Returns a string describing a given message type.
    */
   static const FlashString *type_to_str(message_type type);
-  static const char *mode_to_str(enum mode mode);
-  static const char *display_mode_to_str(enum display_mode display_mode);
+  static const FlashString *mode_to_str(enum mode mode);
+  static const FlashString *display_mode_to_str(enum display_mode display_mode);
 
   virtual size_t printTo(Print &p) const;
 
