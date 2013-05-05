@@ -89,6 +89,7 @@ MaxRFMessage *MaxRFMessage::create_message_from_type(message_type type) {
     case WALL_THERMOSTAT_STATE:          return new WallThermostatStateMessage();
     case THERMOSTAT_STATE:               return new ThermostatStateMessage();
     case SET_DISPLAY_ACTUAL_TEMPERATURE: return new SetDisplayActualTemperatureMessage();
+    case ACK:                            return new AckMessage();
     default:                             return new UnknownMessage();
   }
 }
@@ -272,6 +273,56 @@ size_t SetDisplayActualTemperatureMessage::printTo(Print &p) const{
   p << V<Title>(F("Display mode:")) << display_mode_str[this->display_mode] << "\r\n";
 }
 
+/* AckMessage */
+bool AckMessage::parse_payload(const uint8_t *buf, size_t len) {
+  if (len < 4)
+    return false;
+
+  /* XXX: Perhaps buf[0] == 0x01 can be used here instead? */
+  if (this->from && this->from->type == DEVICE_RADIATOR) {
+    /* We only know about packet formats sent by radiators yet */
+
+    this->mode = (enum mode) (buf[1] & 0x3);
+    this->dst = (buf[1] >> 2) & 0x1;
+    /* The locked and battery_low bits are unconfirmed, but they probably
+     * match the RadiatorThermostateStateMessage. */
+    this->locked = (buf[1] >> 5) & 0x1;
+    this->battery_low = (buf[1] >> 7) & 0x1;
+    this->valve_pos = buf[2];
+    this->set_temp = buf[3];
+
+    this->until = NULL;
+    if (this->mode == MODE_TEMPORARY && len >= 7)
+      this->until = new UntilTime(buf + 4);
+  }
+
+  return true;
+}
+
+size_t AckMessage::printTo(Print &p) const {
+  MaxRFMessage::printTo(p);
+  if (this->from && this->from->type == DEVICE_RADIATOR) {
+    p << V<Title>(F("Mode:")) << mode_str[this->mode] << "\r\n";
+    p << V<Title>(F("Adjust to DST:")) << this->dst << "\r\n";
+    p << V<Title>(F("Locked:")) << this->locked << "\r\n";
+    p << V<Title>(F("Battery Low:")) << this->battery_low << "\r\n";
+    p << V<Title>(F("Valve position:")) << this->valve_pos << "%" << "\r\n";
+    p << V<Title>(F("Set temp:")) << V<SetTemp>(this->set_temp) << "\r\n";
+
+    if (this->until)
+      p << V<Title>(F("Until:")) << *(this->until) << "\r\n";
+  }
+
+  return 0; /* XXX */
+}
+
+void AckMessage::updateState() {
+  if (this->from && this->from->type == DEVICE_RADIATOR) {
+    this->from->set_temp = this->set_temp;
+    this->from->data.radiator.valve_pos = this->valve_pos;
+  }
+}
+
 /* UntilTime */
 
 UntilTime::UntilTime(const uint8_t *buf) {
@@ -343,6 +394,9 @@ Sent to radiator thermostats only?
 */
 
 /*
+
+Ack from radiator thermostat:
+
 Sequence num:   2C
 Flags:          02
 Packet type:    02 (Ack)
@@ -368,6 +422,19 @@ Payload:        01 12 04 24 48 0D 1B
 00: Valve position / displaymode flags
 24: Set temp (18.0°)
 48 0D 1B: Until time
+
+
+Ack from wall thermostat to SetTemperature:
+
+Sequence num:   4F
+Flags:          00
+Packet type:    02 (Ack)
+Packet from:    00B825
+Packet to:      0298E5
+Group id:       00
+Payload:        00
+
+00: ???
 */
 
 /* vim: set sw=2 sts=2 expandtab: */

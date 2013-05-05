@@ -206,6 +206,22 @@ public:
   enum display_mode display_mode;
 };
 
+class AckMessage : public MaxRFMessage {
+public:
+  virtual bool parse_payload(const uint8_t *buf, size_t len);
+  virtual size_t printTo(Print &p) const;
+  virtual void updateState();
+
+  bool dst;
+  bool locked;
+  bool battery_low;
+  enum mode mode;
+  uint8_t valve_pos; /* In percent */
+  uint8_t set_temp; /* In 0.5° units */
+  UntilTime *until; /* Only when mode is MODE_TEMPORARY */
+  virtual ~AckMessage() {delete this->until; }
+};
+
 #endif // __MAX_RF_PROTO_H
 
 /* vim: set sw=2 sts=2 expandtab: */
