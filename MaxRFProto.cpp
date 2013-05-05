@@ -1,4 +1,5 @@
 #include "MaxRFProto.h"
+#include "Arduino.h"
 
 /* TStreaming Formatting type to use for the field titles in print
  * output. */
@@ -133,6 +134,10 @@ size_t MaxRFMessage::printTo(Print &p) const {
   return 0; /* XXX */
 }
 
+void MaxRFMessage::updateState() {
+  /* Nothing to do */
+}
+
 /* UnknownMessage */
 bool UnknownMessage::parse_payload(const uint8_t *buf, size_t len) {
   this->payload = buf;
@@ -196,6 +201,13 @@ size_t WallThermostatStateMessage::printTo(Print &p) const {
   return 0; /* XXX */
 }
 
+void WallThermostatStateMessage::updateState() {
+  MaxRFMessage::updateState();
+  this->from->set_temp = this->set_temp;
+  this->from->actual_temp = this->actual_temp;
+  this->from->actual_temp_time = millis();
+}
+
 /* ThermostatStateMessage */
 
 bool ThermostatStateMessage::parse_payload(const uint8_t *buf, size_t len) {
@@ -236,6 +248,15 @@ size_t ThermostatStateMessage::printTo(Print &p) const {
     p << V<Title>(F("Until:")) << *(this->until) << "\r\n";
 
   return 0; /* XXX */
+}
+
+void ThermostatStateMessage::updateState() {
+  this->from->set_temp = this->set_temp;
+  this->from->data.radiator.valve_pos = this->valve_pos;
+  if (this->actual_temp) {
+    this->from->actual_temp = this->actual_temp;
+    this->from->actual_temp_time = millis();
+  }
 }
 
 /* SetDisplayActualTemperatureMessage */

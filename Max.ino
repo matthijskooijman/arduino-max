@@ -232,21 +232,7 @@ void loop()
     } else {
       p << *rfm << "\r\n";
 
-      /* Update internal state from some messages */
-      if (rfm->type == 0x42) { /* WallThermostatState */
-        WallThermostatStateMessage *m = (WallThermostatStateMessage*)rfm;
-        m->from->set_temp = m->set_temp;
-        m->from->actual_temp = m->actual_temp;
-        m->from->actual_temp_time = millis();
-      } else if (rfm->type == 0x60) { /* ThermostateState */
-        ThermostatStateMessage *m = (ThermostatStateMessage*)rfm;
-        m->from->set_temp = m->set_temp;
-        m->from->data.radiator.valve_pos = m->valve_pos;
-        if (m->actual_temp) {
-          m->from->actual_temp = m->actual_temp;
-          m->from->actual_temp_time = millis();
-        }
-      }
+      rfm->updateState();
     }
     delete rfm;
 

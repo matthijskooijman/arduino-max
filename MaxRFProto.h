@@ -119,6 +119,11 @@ public:
 
   virtual size_t printTo(Print &p) const;
 
+  /**
+   * Update any device states that can be derived from this message.
+   */
+  virtual void updateState();
+
   uint8_t seqnum;
   uint8_t flags;
   message_type type;
@@ -170,6 +175,7 @@ class WallThermostatStateMessage : public MaxRFMessage {
 public:
   virtual bool parse_payload(const uint8_t *buf, size_t len);
   virtual size_t printTo(Print &p) const;
+  virtual void updateState();
 
   uint16_t actual_temp; /* In 0.1° units */
   uint8_t set_temp; /* In 0.5° units */
@@ -179,6 +185,7 @@ class ThermostatStateMessage : public MaxRFMessage {
 public:
   virtual bool parse_payload(const uint8_t *buf, size_t len);
   virtual size_t printTo(Print &p) const;
+  virtual void updateState();
 
   bool dst;
   bool locked;
