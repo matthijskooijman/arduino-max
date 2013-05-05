@@ -54,3 +54,12 @@ in your shell that points to a checkout of the above repository.
 
 If you have that, run `make` to compile the sketch, `make size` to get a
 memory usage report and `make upload` to upload the sketch.
+
+Known devices
+-------------
+Inside MaxRFProto.cpp, there is a hardcoded list of known devices, of
+which state is kept. Leaving the list empty will just add any devices
+when a message from or to them is reveived (up to a number of devices
+hardcoded in MaxRFProto.h). Adding devices to the list helps to give
+them a name and let the code know about the device type (which cannot
+always be determined automically).
