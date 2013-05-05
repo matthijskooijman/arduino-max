@@ -30,40 +30,40 @@ Device devices[] = {
 
 /* MaxRFMessage */
 
-const FlashString *MaxRFMessage::type_to_str(uint8_t type) {
+const FlashString *MaxRFMessage::type_to_str(message_type type) {
   switch(type) {
-    case 0x00: return F("PairPing");
-    case 0x01: return F("PairPong");
-    case 0x02: return F("Ack");
-    case 0x03: return F("TimeInformation");
-    case 0x10: return F("ConfigWeekProfile");
-    case 0x11: return F("ConfigTemperatures");
-    case 0x12: return F("ConfigValve");
-    case 0x20: return F("AddLinkPartner");
-    case 0x21: return F("RemoveLinkPartner");
-    case 0x22: return F("SetGroupId");
-    case 0x23: return F("RemoveGroupId");
-    case 0x30: return F("ShutterContactState");
-    case 0x40: return F("SetTemperature");
-    case 0x42: return F("WallThermostatState");
-    case 0x43: return F("SetComfortTemperature");
-    case 0x44: return F("SetEcoTemperature");
-    case 0x50: return F("PushButtonState");
-    case 0x60: return F("ThermostatState");
-    case 0x82: return F("SetDisplayActualTemperature");
-    case 0xF1: return F("WakeUp");
-    case 0xF0: return F("Reset");
+    case PAIR_PING:                      return F("PairPing");
+    case PAIR_PONG:                      return F("PairPong");
+    case ACK:                            return F("Ack");
+    case TIME_INFORMATION:               return F("TimeInformation");
+    case CONFIG_WEEK_PROFILE:            return F("ConfigWeekProfile");
+    case CONFIG_TEMPERATURES:            return F("ConfigTemperatures");
+    case CONFIG_VALVE:                   return F("ConfigValve");
+    case ADD_LINK_PARTNER:               return F("AddLinkPartner");
+    case REMOVE_LINK_PARTNER:            return F("RemoveLinkPartner");
+    case SET_GROUP_ID:                   return F("SetGroupId");
+    case REMOVE_GROUP_ID:                return F("RemoveGroupId");
+    case SHUTTER_CONTACT_STATE:          return F("ShutterContactState");
+    case SET_TEMPERATURE:                return F("SetTemperature");
+    case WALL_THERMOSTAT_STATE:          return F("WallThermostatState");
+    case SET_COMFORT_TEMPERATURE:        return F("SetComfortTemperature");
+    case SET_ECO_TEMPERATURE:            return F("SetEcoTemperature");
+    case PUSH_BUTTON_STATE:              return F("PushButtonState");
+    case THERMOSTAT_STATE:               return F("ThermostatState");
+    case SET_DISPLAY_ACTUAL_TEMPERATURE: return F("SetDisplayActualTemperature");
+    case WAKE_UP:                        return F("WakeUp");
+    case RESET:                          return F("Reset");
+    default:                             return F("Unknown");
   }
-  return F("Unknown");
 }
 
-MaxRFMessage *MaxRFMessage::create_message_from_type(uint8_t type) {
+MaxRFMessage *MaxRFMessage::create_message_from_type(message_type type) {
   switch(type) {
-    case 0x40: return new SetTemperatureMessage();
-    case 0x42: return new WallThermostatStateMessage();
-    case 0x60: return new ThermostatStateMessage();
-    case 0x82: return new SetDisplayActualTemperatureMessage();
-    default: return new UnknownMessage();
+    case SET_TEMPERATURE:                return new SetTemperatureMessage();
+    case WALL_THERMOSTAT_STATE:          return new WallThermostatStateMessage();
+    case THERMOSTAT_STATE:               return new ThermostatStateMessage();
+    case SET_DISPLAY_ACTUAL_TEMPERATURE: return new SetDisplayActualTemperatureMessage();
+    default:                             return new UnknownMessage();
   }
 }
 
@@ -71,7 +71,7 @@ MaxRFMessage *MaxRFMessage::parse(const uint8_t *buf, size_t len) {
   if (len < 10)
     return NULL;
 
-  uint8_t type = buf[2];
+  message_type type = (message_type)buf[2];
   MaxRFMessage *m = create_message_from_type(type);
 
   m->seqnum = buf[0];
