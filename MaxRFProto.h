@@ -31,12 +31,12 @@ typedef SpecialValue<Postfix<NoFormat, TChar<'%'>>,
                      TStr<na>>
         ValvePos;
 
-enum class Mode {AUTO, MANUAL, TEMPORARY, BOOST, UNKNOWN};
-enum class DisplayMode {SET_TEMP, ACTUAL_TEMP};
+enum class Mode : uint8_t {AUTO, MANUAL, TEMPORARY, BOOST, UNKNOWN};
+enum class DisplayMode : uint8_t {SET_TEMP, ACTUAL_TEMP};
 
-enum class DeviceType {UNKNOWN, CUBE, WALL, RADIATOR};
+enum class DeviceType : uint8_t {UNKNOWN, CUBE, WALL, RADIATOR};
 
-enum class MessageType {
+enum class MessageType : uint8_t {
   PAIR_PING                      = 0x00,
   PAIR_PONG                      = 0x01,
   ACK                            = 0x02,
