@@ -102,16 +102,20 @@ void printStatus() {
 #ifdef KETTLE_RELAY_PIN
 void switchKettle() {
   uint32_t total = 0;
+  uint32_t max = 0;
   for (int i = 0; i < lengthof(devices); ++i) {
     Device *d = &devices[i];
     if (!d->address) break;
     if (d->type != DeviceType::RADIATOR) continue;
     if (d->data.radiator.valve_pos == VALVE_UNKNOWN) continue;
     total += d->data.radiator.valve_pos;
+    if (d->data.radiator.valve_pos > max)
+      max = d->data.radiator.valve_pos;
   }
 
-  /* Sum of valve positions > 50% */
-  kettle_status = (total > 50);
+  /* One radiator opened fairly far can turn the kettle on by itself, or
+   * a few radiators opened a little bit. */
+  kettle_status = (max > 30 || total > 40);
   digitalWrite(KETTLE_RELAY_PIN, kettle_status ? HIGH : LOW);
 }
 #endif // KETTLE_RELAY_PIN
