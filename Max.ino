@@ -235,10 +235,9 @@ void loop()
       p << F("Packet is invalid") << "\r\n";
     } else {
       p << *rfm << "\r\n";
-
       rfm->updateState();
+      delete rfm;
     }
-    delete rfm;
 
     #ifdef KETTLE_RELAY_PIN
     switchKettle();
